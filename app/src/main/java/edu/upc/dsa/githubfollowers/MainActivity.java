@@ -18,8 +18,7 @@ public class MainActivity extends AppCompatActivity {
     private ApiRest apiRest;
     private TextView tuser;
     private String user;
-
-
+    private DelayedProgressDialog loader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +29,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void Explore(View view){
        try {
+           loader = new DelayedProgressDialog();
+           loader.show(getSupportFragmentManager(), "tag");
+
            user = tuser.getText().toString();
+
            apiRest= Api.connection();
 
            Call<User> call = apiRest.getuser(user);
@@ -44,8 +47,10 @@ public class MainActivity extends AppCompatActivity {
                        intent.putExtra("following", response.body().following);
                        intent.putExtra("repos", response.body().public_repos);
                        startActivity(intent);
+                       loader.cancel();
                    }
                    else {
+                       loader.cancel();;
                        Context context = getApplicationContext();
                        int duration = Toast.LENGTH_SHORT;
                        CharSequence text = "Error";
@@ -61,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
            });
        }
        catch (Exception e){
+           loader.cancel();
            Context context = getApplicationContext();
            int duration = Toast.LENGTH_SHORT;
             CharSequence text = e.getMessage();
@@ -69,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
            Log.e("Error", e.getMessage());
 
         }
+
 
     }
 }
